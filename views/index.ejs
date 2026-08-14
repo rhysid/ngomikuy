@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ngomikuy - Baca Manga Online</title>
+    <!-- Pastikan file style.css ada di dalam folder /public -->
+    <link rel="stylesheet" href="/style.css">
+    <!-- FontAwesome buat Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+               <a href="/" class="logo">
+    <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+</a>
+        </div>
+        
+        <!-- Menu Navigasi di Tengah -->
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/pustaka" class="active">Pustaka</a></li>
+            <li><a href="/genre">Genre List</a></li>
+            <li><a href="/bookmark">Bookmark</a></li>
+        </ul>
+        
+        <!-- Icon Kanan -->
+        <div class="nav-right">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+            <button class="icon-btn"><i class="far fa-user"></i></button>
+            <!-- Tombol Hamburger baru buat mobile -->
+            <button class="icon-btn menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- HERO BANNERS (3 Kolom Dinamis) -->
+        <section class="hero-banners">
+            <% if (heroBanners && heroBanners.length > 0) { %>
+                <% heroBanners.forEach(hero => { %>
+                    <div class="hero-card">
+                        <!-- Gunakan fallback property jika API memakai format penamaan berbeda -->
+                       <!-- Sebelumnya: <div class="hero-card"> -->
+<a href="/manga/<%= hero.manga_id || hero.id %>" class="hero-card">
+    <img src="<%= hero.image || hero.thumbnail || hero.cover %>" alt="Cover" class="bg-img">
+    <!-- ... sisa elemen hero lainnya ... -->
+</a> <div class="top-badge"><%= hero.type || 'MANHWA' %></div>
+                        <div class="top-right-logo">Ngomikuy</div>
+                        
+                        <div class="card-info">
+                            <span class="hot-badge"><i class="fas fa-fire"></i> Hot</span>
+                            <h2><%= hero.title || hero.name %></h2>
+                            <div class="tags">
+                                <!-- Dummy tags atau data asli jika ada array genre dari API -->
+                                <% if(hero.genres && Array.isArray(hero.genres)) { %>
+                                    <% hero.genres.slice(0, 3).forEach(genre => { %>
+                                        <span><%= genre.name || genre %></span>
+                                    <% }) %>
+                                <% } else { %>
+                                    <span>Action</span>
+                                    <span>Fantasy</span>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p style="color:white;">Data banner tidak tersedia.</p>
+            <% } %>
+        </section>
+
+        <!-- POPULAR TODAY (Carousel Dinamis) -->
+        <section class="popular-today">
+            <div class="section-title">
+                <h3><i class="fas fa-fire"></i> Popular Today</h3>
+            </div>
+            
+            <div class="popular-carousel">
+                <% if (popularToday && popularToday.length > 0) { %>
+                    <% popularToday.forEach(manga => { %>
+                        <div class="pop-card" title="<%= manga.title || manga.name %>">
+                          <!-- Sebelumnya: <div class="pop-card" ...> -->
+<a href="/manga/<%= manga.manga_id || manga.id %>" class="pop-card" title="<%= manga.title || manga.name %>">
+    <img src="<%= manga.image || manga.thumbnail || manga.cover %>" alt="<%= manga.title %>">
+    <!-- ... sisa elemen overlay ... -->
+</a> <div class="pop-overlay">
+                                <h4 class="pop-title"><%= manga.title || manga.name %></h4>
+                                <div class="pop-hover-info">
+                                    <span class="flag"><%= manga.flag || '🇰🇷' %></span>
+                                    <span class="rating"><i class="fas fa-star"></i> <%= manga.rating || '8.50' %></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p style="color:white;">Data populer tidak tersedia.</p>
+                <% } %>
+            </div>
+        </section>
+
+        <!-- MAIN CONTENT: LAST UPDATE & SIDEBAR -->
+        <div class="main-layout">
+            
+            <!-- KIRI: LAST UPDATE -->
+            <main class="content-left">
+                <div class="section-header-flex">
+                    <h3><i class="fas fa-desktop"></i> Last Update</h3>
+                    <div class="header-actions">
+                        <a href="#" class="view-all-text">View All <i class="fas fa-globe"></i></a>
+                        <button class="view-btn" id="btn-grid"><i class="fas fa-th-large"></i></button>
+                        <button class="view-btn active" id="btn-list"><i class="fas fa-th-list"></i></button>
+                    </div>
+                </div>
+
+<div id="listViewContainer" class="update-grid" style="display: grid; gap: 15px;">
+        <% if (latestUpdates && latestUpdates.length > 0) { %>
+            <% latestUpdates.forEach(manga => { %>
+                <div class="update-card">
+                    <a href="/manga/<%= manga.manga_id || manga.id %>" style="display: block; flex-shrink: 0; text-decoration: none;">
+                        <div class="update-thumb">
+                            <img src="<%= manga.image || manga.thumbnail || manga.cover %>" alt="Cover">
+                            <span class="hot-icon"><i class="fas fa-fire"></i></span>
+                            <span class="flag-icon"><%= manga.flag || '🇰🇷' %></span>
+                        </div>
+                    </a>
+
+                    <div class="update-info">
+                        <a href="/manga/<%= manga.manga_id || manga.id %>" style="text-decoration: none; color: inherit;">
+                            <h4><%= manga.title || manga.name %></h4>
+                        </a>
+                        
+                        <ul class="chapter-list">
+                            <% if (manga.latest_chapters && manga.latest_chapters.length > 0) { %>
+                                <% manga.latest_chapters.forEach(chapter => { %>
+                                    <li style="padding: 0; overflow: hidden;">
+                                        <a href="/read/<%= chapter.chapter_id || chapter.id %>" style="display: flex; justify-content: space-between; width: 100%; padding: 6px 8px; color: inherit; text-decoration: none; box-sizing: border-box;">
+                                            <span>Ch. <%= chapter.chapter_number || chapter.name %></span> 
+                                            <% 
+                                                let timeAgo = 'Baru saja';
+                                                if (chapter.release_date) {
+                                                    const diffMs = new Date() - new Date(chapter.release_date);
+                                                    const diffMins = Math.floor(diffMs / (1000 * 60));
+                                                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                                                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                                                    const diffMonths = Math.floor(diffDays / 30);
+                                                    const diffYears = Math.floor(diffDays / 365);
+
+                                                    if (diffYears > 0) { timeAgo = diffYears + 'y lalu'; } 
+                                                    else if (diffMonths > 0) { timeAgo = diffMonths + 'mo lalu'; } 
+                                                    else if (diffDays > 0) { timeAgo = diffDays + 'd lalu'; } 
+                                                    else if (diffHours > 0) { timeAgo = diffHours + 'h lalu'; } 
+                                                    else if (diffMins > 0) { timeAgo = diffMins + 'm lalu'; } 
+                                                    else { timeAgo = 'Baru saja'; }
+                                                }
+                                            %>
+                                            <span class="time"><%= timeAgo %></span>
+                                        </a>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li><span style="padding: 6px 8px; display: block;">Belum ada chapter</span></li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p style="color:white;">Data update terbaru tidak tersedia.</p>
+        <% } %>
+    </div>
+
+    <!-- ==========================================
+         WADAH 2: GRID VIEW (DESAIN BARU - DEFAULT SEMBUNYI)
+         ========================================== -->
+    <div id="gridViewContainer" style="display: none; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
+        <% if (latestUpdates && latestUpdates.length > 0) { %>
+            <% latestUpdates.forEach(manga => { %>
+                <div style="display: flex; flex-direction: column;">
+                    <!-- GAMBAR COVER & BADGE -->
+                    <a href="/manga/<%= manga.manga_id || manga.id %>" style="display: block; position: relative; border-radius: 6px; overflow: hidden; aspect-ratio: 2/3;">
+                        <img src="<%= manga.cover_portrait || manga.image || manga.thumbnail || manga.cover %>" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;">
+                        <span style="position: absolute; top: 5px; left: 5px; background: white; color: black; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 3px;">IKIRU</span>
+                        <span style="position: absolute; top: 5px; right: 5px; font-size: 16px;"><%= manga.flag || '🇰🇷' %></span>
+                        <span style="position: absolute; bottom: 5px; right: 5px; background: #ff3b5c; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; justify-content: center; align-items: center; font-size: 11px;"><i class="fas fa-fire"></i></span>
+                    </a>
+
+                    <!-- INFO KOMIK (RATING, STATUS, JUDUL, CHAPTER) -->
+                    <div style="margin-top: 10px;">
+                        <!-- RATING & STATUS -->
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: white;">
+                            <span><%= manga.rating || '7.00' %> <i class="fas fa-star" style="color: #ffc107;"></i></span>
+                            <span><i class="fas fa-circle" style="color: #00d26a; font-size: 10px;"></i> <%= manga.status || 'Ongoing' %></span>
+                        </div>
+
+                        <!-- JUDUL -->
+                        <a href="/manga/<%= manga.manga_id || manga.id %>" style="text-decoration: none; color: inherit; display: block; text-align: center; margin-bottom: 12px; min-height: 38px;">
+                            <h4 style="font-size: 14px; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"><%= manga.title || manga.name %></h4>
+                        </a>
+                        
+                        <!-- DAFTAR CHAPTER (Cuma 2 biar rapi kayak gambar) -->
+                        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px;">
+                            <% if (manga.latest_chapters && manga.latest_chapters.length > 0) { %>
+                                <% manga.latest_chapters.slice(0, 2).forEach(chapter => { %>
+                                    <li style="background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden;">
+                                        <a href="/read/<%= chapter.chapter_id || chapter.id %>" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 8px 10px; color: inherit; text-decoration: none; box-sizing: border-box;">
+                                            <span style="font-size: 12px; font-weight: 700; color: white;">Ch. <%= chapter.chapter_number || chapter.name %></span> 
+                                            <% 
+                                                let timeAgo = 'Just now';
+                                                if (chapter.release_date) {
+                                                    const diffMs = new Date() - new Date(chapter.release_date);
+                                                    const diffMins = Math.floor(diffMs / (1000 * 60));
+                                                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                                                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                                                    if (diffDays > 0) { timeAgo = diffDays + ' days ago'; } 
+                                                    else if (diffHours > 0) { timeAgo = diffHours + ' hours ago'; } 
+                                                    else if (diffMins > 0) { timeAgo = diffMins + ' mins ago'; }
+                                                }
+                                            %>
+                                            <span style="font-size: 11px; color: #a19fb5;"><%= timeAgo %></span>
+                                        </a>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li style="background: rgba(255, 255, 255, 0.05); border-radius: 4px;"><span style="padding: 8px 10px; display: block; font-size: 12px; color: #a19fb5;">Belum ada chapter</span></li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+
+                <!-- Pagination (Statis sementara) -->
+                <div class="pagination">
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>4</button>
+                    <button>5</button>
+                    <button><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </main>
+
+            <!-- KANAN: SIDEBAR -->
+            <aside class="content-right">
+                
+                <!-- Discord Banner -->
+                <a href="https://discord.gg/A37jctvqqZ" class="sidebar-discord">
+                    <i class="fab fa-discord"></i> Discord
+                </a>
+
+                <!-- Judul Populer Sidebar (Gua mapping ulang pake data Top Series biar dinamis juga) -->
+                <div class="sidebar-popular">
+                    <div class="section-title" style="margin-bottom: 15px;">
+                        <h3><i class="fas fa-fire"></i> Judul Populer</h3>
+                    </div>
+                    <!--
+                    <div class="pop-tabs">
+                        <button class="active">Today</button>
+                        <button>Weekly</button>
+                        <button>Monthly</button>
+                    </div>
+                -->
+                    <div class="sidebar-list">
+                        <% if (topSeries && topSeries.length > 0) { %>
+                            <% topSeries.slice(0, 10).forEach((series, idx) => { %>
+                                <!-- Mengambil 3 teratas dari Top Series untuk sidebar -->
+                                <% const colors = ['#2ecc71', 'silver', '#cd7f32']; %>
+                                <div class="side-item">
+                                    <img src="<%= series.image || series.thumbnail || series.cover %>" alt="Popular">
+                                    <div class="side-info">
+                                        <span class="rank-icon"><i class="fas fa-medal" style="color: <%= colors[idx] %>;"></i></span>
+                                        <h5><%= series.title || series.name %></h5>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } %>
+                    </div>
+                </div>
+            </aside>
+        </div>
+        
+        <!-- TOP SERIES SECTION (Dinamis dari Data API) -->
+      <section class="top-series">
+            <div class="section-title" style="margin-bottom: 20px;">
+                <h3><i class="far fa-star"></i> Top Series</h3>
+            </div>
+            
+            <div class="top-series-grid">
+                <% if (topSeries && topSeries.length > 0) { %>
+                    <% topSeries.forEach((series, index) => { %>
+                        <div class="ts-card">
+                            <!-- BUNGKUS GAMBAR DENGAN LINK -->
+                            <a href="/manga/<%= series.manga_id || series.id %>" style="display: block; position: relative; text-decoration: none;">
+                                <img src="<%= series.image || series.thumbnail || series.cover %>" alt="Cover">
+                                <!-- Indexing otomatis untuk Rank 1, 2, 3 dst -->
+                                <div class="ts-rank"><%= index + 1 %></div>
+                            </a>
+                            
+                            <div class="ts-info">
+                                <!-- BUNGKUS JUDUL DENGAN LINK -->
+                                <a href="/manga/<%= series.manga_id || series.id %>" style="text-decoration: none; color: inherit; display: inline-block; margin-bottom: 5px;">
+                                    <h4 style="transition: color 0.2s;"><%= series.title || series.name %></h4>
+                                </a>
+                                
+                                <div class="ts-tags <%= index % 2 !== 0 ? 'alt-tag' : '' %>">
+                                    <% if(series.genres && Array.isArray(series.genres)) { %>
+                                        <% series.genres.slice(0, 3).forEach(genre => { %>
+                                            <span><%= genre.name || genre %></span>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <span>Drama</span>
+                                        <span>Action</span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p style="color:white;">Data top series tidak tersedia.</p>
+                <% } %>
+            </div>
+        </section>
+        <!-- FOOTER SECTION -->
+        <footer class="site-footer">
+            <div class="footer-logo">
+            <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+        </div>
+            <p class="footer-tagline">Read Comics, manga, manhua, manhwa, translated swiftly: Ngomikuy, your ultimate library.</p>
+            <a href="#" class="footer-contact">Contact us</a>
+            
+            <hr class="footer-divider">
+            
+            <div class="footer-bottom">
+                <p><i class="fas fa-heart"></i> Made by Ngomikuy</p>
+                <p>&copy; 2026 All Rights Reserved</p>
+            </div>
+        </footer>
+    </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnGrid = document.getElementById('btn-grid');
+        const btnList = document.getElementById('btn-list');
+        const gridView = document.getElementById('gridViewContainer');
+        const listView = document.getElementById('listViewContainer');
+
+        if (btnGrid && btnList && gridView && listView) {
+            // Aksi saat pencet Grid (fa-th-large)
+            btnGrid.addEventListener('click', () => {
+                // Tampilkan Grid, Sembunyikan List
+                gridView.style.display = 'grid';
+                listView.style.display = 'none';
+                
+                // Ubah warna tombol
+                btnGrid.style.background = 'var(--accent-green, #00d26a)';
+                btnGrid.style.color = 'white';
+                
+                btnList.style.background = 'transparent';
+                btnList.style.color = '#a19fb5';
+            });
+
+            // Aksi saat pencet List (fa-th-list)
+            btnList.addEventListener('click', () => {
+                // Tampilkan List, Sembunyikan Grid
+                listView.style.display = 'grid'; // atau block, tergantung css bawaan lu
+                gridView.style.display = 'none';
+                
+                // Ubah warna tombol
+                btnList.style.background = 'var(--accent-green, #00d26a)';
+                btnList.style.color = 'white';
+                
+                btnGrid.style.background = 'transparent';
+                btnGrid.style.color = '#a19fb5';
+            });
+        }
+    });
+</script>
+    <!-- Pastikan file script.js ada di dalam folder /public -->
+    <script src="/script.js"></script>
+</body>
+</html>
