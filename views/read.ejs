@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter <%= read.chapter_number %> - <%= manga.title || 'Baca Komik' %> - Ngomikuy</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+               <a href="/" class="logo">
+    <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/pustaka" class="active">Pustaka</a></li>
+            <li><a href="/genre">Genre List</a></li>
+            <li><a href="/bookmark">Bookmark</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+            <button class="icon-btn"><i class="far fa-user"></i></button>
+            <button class="icon-btn menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- KONTEN HALAMAN BACA -->
+    <div class="read-container">
+        
+        <!-- Header Info Komik -->
+        <div class="read-header">
+            
+            <img src="<%= read.thumbnail || manga.cover %>" alt="Thumb" class="read-thumb">
+            <div class="read-info">
+                <h2><%= manga.title || 'Judul Manga' %> - Chapter <%= read.chapter_number %></h2>
+                <% 
+                    const date = new Date(read.release_date); 
+                    const formattedDate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                %>
+                <span class="read-time"><%= formattedDate %></span>
+            </div>
+        </div>
+
+        <!-- Tombol Navigasi Atas -->
+        <div class="read-nav">
+            <div class="nav-buttons">
+                <!-- PREV BUTTON -->
+                <% if (read.prev_chapter && read.prev_chapter.chapter_id) { %>
+                    <a href="/read/<%= read.prev_chapter.chapter_id %>" class="btn-dark-nav" style="text-decoration: none;">
+                        <i class="fas fa-chevron-left"></i> <span class="btn-text">Prev</span>
+                    </a>
+                <% } else { %>
+                    <button class="btn-dark-nav" disabled style="opacity: 0.5; cursor: not-allowed;">
+                        <i class="fas fa-chevron-left"></i> <span class="btn-text">Prev</span>
+                    </button>
+                <% } %>
+                
+                <!-- HOME BUTTON (Ke halaman Detail) -->
+                <a href="/manga/<%= read.manga_id %>" class="btn-dark-nav" style="text-decoration: none;">
+                    <i class="fas fa-home"></i> <span class="btn-text">Home</span>
+                </a>
+                
+                <!-- NEXT BUTTON -->
+                <% if (read.next_chapter && read.next_chapter.chapter_id) { %>
+                    <a href="/read/<%= read.next_chapter.chapter_id %>" class="btn-dark-nav" style="text-decoration: none;">
+                        <span class="btn-text">Next</span> <i class="fas fa-chevron-right"></i>
+                    </a>
+                <% } else { %>
+                    <button class="btn-dark-nav" disabled style="opacity: 0.5; cursor: not-allowed;">
+                        <span class="btn-text">Next</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                <% } %>
+            </div>
+            
+            <!-- DROPDOWN CHAPTER -->
+            <div class="chapter-select">
+                <!-- Javascript 'onchange' biar otomatis pindah URL saat dipilih -->
+                <select class="btn-green-select" onchange="window.location.href=this.value;">
+                    <% if (chapters && chapters.length > 0) { %>
+                        <% chapters.forEach(function(chap) { %>
+                            <option value="/read/<%= chap.chapter_id %>" <%= chap.chapter_id === read.chapter_id ? 'selected' : '' %>>
+                                Chapter <%= chap.chapter_number %>
+                            </option>
+                        <% }); %>
+                    <% } else { %>
+                        <option value="">Chapter <%= read.chapter_number %></option>
+                    <% } %>
+                </select>
+                <i class="fas fa-chevron-down select-icon"></i>
+            </div>
+        </div>
+
+        <!-- Panel Gambar Komik -->
+        <div class="comic-panel">
+            <% if (read.images && read.images.length > 0) { %>
+                <% read.images.forEach(function(imgUrl, index) { %>
+                    <!-- lazy loading biar server client ga terlalu berat pas load gambar banyak -->
+                    <img src="<%= imgUrl %>" alt="Page <%= index + 1 %>" loading="lazy">
+                <% }); %>
+            <% } else { %>
+                <p style="color: white; padding: 50px;">Gambar tidak tersedia untuk chapter ini.</p>
+            <% } %>
+        </div>
+
+        <!-- Tombol Navigasi Bawah -->
+        <div class="bottom-nav-bar">
+            <% if (read.prev_chapter && read.prev_chapter.chapter_id) { %>
+                <a href="/read/<%= read.prev_chapter.chapter_id %>" class="btn-dark-nav" style="text-decoration: none;">
+                    <i class="fas fa-chevron-left"></i> <span class="btn-text">Prev</span>
+                </a>
+            <% } else { %>
+                <button class="btn-dark-nav" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    <i class="fas fa-chevron-left"></i> <span class="btn-text">Prev</span>
+                </button>
+            <% } %>
+            
+            <div class="chapter-select bottom-select">
+                <select class="btn-green-select" onchange="window.location.href=this.value;">
+                    <% if (chapters && chapters.length > 0) { %>
+                        <% chapters.forEach(function(chap) { %>
+                            <option value="/read/<%= chap.chapter_id %>" <%= chap.chapter_id === read.chapter_id ? 'selected' : '' %>>
+                                Chapter <%= chap.chapter_number %>
+                            </option>
+                        <% }); %>
+                    <% } else { %>
+                        <option value="">Chapter <%= read.chapter_number %></option>
+                    <% } %>
+                </select>
+                <i class="fas fa-chevron-down select-icon"></i>
+            </div>
+
+            <% if (read.next_chapter && read.next_chapter.chapter_id) { %>
+                <a href="/read/<%= read.next_chapter.chapter_id %>" class="btn-dark-nav" style="text-decoration: none;">
+                    <span class="btn-text">Next</span> <i class="fas fa-chevron-right"></i>
+                </a>
+            <% } else { %>
+                <button class="btn-dark-nav" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    <span class="btn-text">Next</span> <i class="fas fa-chevron-right"></i>
+                </button>
+            <% } %>
+        </div>
+
+        <!-- ACTION CARDS -->
+        <div class="action-cards read-action-cards">
+            <div class="action-box">
+                <div class="action-text">
+                    <h4>Share Ngomikuy</h4>
+                    <p>to your friends</p>
+                </div>
+                <button class="btn btn-green"><i class="fas fa-share-alt"></i> Share now</button>
+            </div>
+            <div class="action-box">
+                <div class="action-text">
+                    <h4>Discord</h4>
+                    <p>Join Discord</p>
+                </div>
+                <button class="btn btn-purple"><i class="fab fa-discord"></i> Discord</button>
+            </div>
+            <div class="action-box">
+                <div class="action-text">
+                    <h4>KASIH KOPI DISINI</h4>
+                    <p>Kopinya Gaes~</p>
+                </div>
+                <button class="btn btn-green"><i class="fas fa-envelope"></i> Donasi</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FAB MENU (Pojok Kanan Bawah) -->
+    <div class="fab-container">
+        <div class="fab-menu-vertical">
+            <button class="fab-btn fab-green" title="Scroll Up" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"><i class="fas fa-chevron-up"></i></button>
+            <button class="fab-btn fab-green" title="Scroll Down" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});"><i class="fas fa-chevron-down"></i></button>
+        </div>
+        <div class="fab-menu-horizontal">
+            <!-- Ngarah ke Next Chapter via JS biar clean -->
+            <button class="fab-btn fab-dark" title="Next Chapter" onclick="window.location.href='<%= read.next_chapter && read.next_chapter.chapter_id ? '/read/' + read.next_chapter.chapter_id : '#' %>'"><i class="fas fa-arrow-right"></i></button>
+            <button class="fab-btn fab-dark" title="Settings"><i class="fas fa-cog"></i></button>
+            <button class="fab-btn fab-dark" title="Auto Scroll"><i class="fas fa-play"></i></button>
+            <a href="/manga/<%= read.manga_id %>" class="fab-btn fab-dark" title="Chapter List" style="text-decoration:none;"><i class="fas fa-list-ul"></i></a>
+            <button class="fab-btn fab-red" title="Report/Alert"><i class="fas fa-exclamation-triangle"></i></button>
+            <button class="fab-btn fab-dark" title="Prev Chapter" onclick="window.location.href='<%= read.prev_chapter && read.prev_chapter.chapter_id ? '/read/' + read.prev_chapter.chapter_id : '#' %>'"><i class="fas fa-arrow-left"></i></button>
+        </div>
+        <button class="fab-btn fab-main" id="fabToggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+       <div class="footer-logo">
+            <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+        </div>
+        <p class="footer-tagline">Read Comics, manga, manhua, manhwa, translated swiftly: Ngomikuy, your ultimate library.</p>
+        <div class="footer-bottom">
+            <p><i class="fas fa-heart" style="color: var(--accent-green);"></i> Made by Ngomikuy</p>
+            <p>&copy; 2026 All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <!-- Script FAB Menu -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fabToggle = document.getElementById('fabToggle');
+            const fabContainer = document.querySelector('.fab-container');
+            if(fabToggle && fabContainer) {
+                fabToggle.addEventListener('click', () => {
+                    fabContainer.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

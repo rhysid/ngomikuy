@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= manga.title || 'Detail Komik' %> - Ngomikuy</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+           <a href="/" class="logo">
+    <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/pustaka" class="active">Pustaka</a></li>
+            <li><a href="/genre">Genre List</a></li>
+            <li><a href="/bookmark">Bookmark</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+            <button class="icon-btn"><i class="far fa-user"></i></button>
+            <button class="icon-btn menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- DETAIL CONTAINER -->
+    <div class="detail-container">
+        
+        <!-- Background Blur Image -->
+        <div class="detail-bg-blur" style="background-image: url('<%= manga.cover_portrait || manga.cover %>');"></div>
+
+        <div class="container detail-content">
+            
+            <!-- KOLOM KIRI (Cover & Info) -->
+            <aside class="detail-left">
+                <img src="<%= manga.cover %>" alt="Cover" class="detail-cover">
+                
+                <!-- Tombol Action Utama -->
+                <div class="detail-primary-btns">
+                    <button class="btn btn-green btn-full">Chapter 1</button>
+                   <button type="button" id="bookmarkBtn" class="btn btn-dark btn-full">
+    <i class="far fa-bookmark" id="bookmarkIcon"></i> <span id="bookmarkText">Bookmark</span>
+</button>
+                </div>
+
+                <!-- Stats (Rating & Favorite) -->
+                <div class="detail-stats-boxes">
+                    <div class="stat-box">
+                        <i class="fas fa-star" style="color: #f1c40f;"></i>
+                        <div class="stat-text">
+                            <span class="stat-num"><%= manga.rating || 'N/A' %></span>
+                            <span class="stat-label">Ratings</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <i class="fas fa-bookmark" style="color: #3498db;"></i>
+                        <div class="stat-text">
+                            <% const bookmarksCount = manga.bookmarks ? manga.bookmarks.toLocaleString('id-ID') : '0'; %>
+                            <span class="stat-num"><%= bookmarksCount %></span>
+                            <span class="stat-label">Favorites</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List Informasi -->
+                <ul class="detail-info-list">
+                    <li>
+                        <span><i class="fas fa-cube"></i> Format</span>
+                        <span class="info-val">
+                            <% if (manga.format && manga.format.length > 0) { %>
+                                <%= manga.format[0].name %>
+                            <% } else { %>
+                                -
+                            <% } %>
+                        </span>
+                    </li>
+                    <li>
+                        <span><i class="far fa-calendar-alt"></i> Released</span>
+                        <span class="info-val"><%= manga.release_year || '-' %></span>
+                    </li>
+                    <li>
+                        <span><i class="far fa-eye"></i> Total views</span>
+                        <span class="info-val">
+                            <% const viewsCount = manga.views ? manga.views.toLocaleString('id-ID') : '0'; %>
+                            <%= viewsCount %>
+                        </span>
+                    </li>
+                    <li>
+                        <span><i class="fas fa-flag"></i> Country</span>
+                        <span class="info-val"><%= manga.country || '-' %></span>
+                    </li>
+                    <li>
+                        <span><i class="fas fa-user-edit"></i> Author</span>
+                        <span class="info-val text-right">
+                            <% if (manga.authors && manga.authors.length > 0) { %>
+                                <%= manga.authors.map(function(a) { return a.name; }).join(', ') %>
+                            <% } else { %>
+                                -
+                            <% } %>
+                        </span>
+                    </li>
+                    <li>
+                        <span><i class="fas fa-paint-brush"></i> Artist</span>
+                        <span class="info-val text-right">
+                            <% if (manga.artists && manga.artists.length > 0) { %>
+                                <%= manga.artists.map(function(a) { return a.name; }).join(', ') %>
+                            <% } else { %>
+                                -
+                            <% } %>
+                        </span>
+                    </li>
+                    <li>
+                        <span><i class="fas fa-info-circle"></i> Status</span>
+                        <span class="info-val"><%= manga.status || 'Unknown' %></span>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- KOLOM KANAN (Sinopsis & Komentar) -->
+            <main class="detail-right">
+                
+                <!-- Judul -->
+                <h1><%= manga.title %></h1>
+                <p class="alt-title"><%= manga.alternative_title || '-' %></p>
+
+                <!-- Tabs -->
+       <!-- Tabs -->
+                <div class="detail-tabs">
+                    <span class="tab active" data-target="tab-synopsis"><i class="fas fa-list-ul"></i> Synopsis</span>
+                    <!-- Mengambil total_record dari API pagination buat nampilin total chapter -->
+                    <span class="tab" data-target="tab-chapters">
+                        <i class="fas fa-book-open"></i> Chapters (<%= pagination.total_record || chapters.length || 0 %>)
+                    </span>
+                </div>
+
+                <!-- ================= TAB SINOPSIS ================= -->
+                <div id="tab-synopsis" class="tab-content active">
+                    <div class="summary-box">
+                        <h4>Summary</h4>
+                        <p class="summary-text">
+                            <%= manga.description || 'Sinopsis belum tersedia.' %>
+                        </p>
+                    </div>
+
+                    <div class="detail-tags">
+                        <% if (manga.genres && manga.genres.length > 0) { %>
+                            <% manga.genres.forEach(function(genre) { %>
+                                <span><%= genre.name %></span>
+                            <% }); %>
+                        <% } else { %>
+                            <span>No Genres</span>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- ================= TAB CHAPTERS ================= -->
+                <div id="tab-chapters" class="tab-content">
+                    <div class="chapter-search-box">
+                        <input type="text" placeholder="Search chapter">
+                    </div>
+
+                    <div class="chapter-list-container">
+                        <% if (chapters && chapters.length > 0) { %>
+                            <% chapters.forEach(function(chapter) { %>
+                                <!-- Nanti href-nya bisa diarahkan ke halaman /read/:chapter_id -->
+                                <a href="/read/<%= chapter.chapter_id %>" class="chapter-row">
+                                    <div class="chap-left">
+                                        <!-- Jika thumbnail chapter null/kosong, pakai cover komik -->
+                                        <img src="<%= chapter.thumbnail || manga.cover %>" alt="Chapter <%= chapter.chapter_number %>">
+                                        <div class="chap-title">
+                                            <h5>Chapter <%= chapter.chapter_number %></h5>
+                                            
+                                            <!-- Format tanggal (contoh: dari 2026-07-28T03:27:57Z jadi format lokal) -->
+                                            <% 
+                                                const date = new Date(chapter.release_date); 
+                                                const options = { day: 'numeric', month: 'short', year: 'numeric' };
+                                                const formattedDate = date.toLocaleDateString('id-ID', options);
+                                            %>
+                                            <span><%= formattedDate %></span>
+                                        </div>
+                                    </div>
+                                    <div class="chap-right">
+                                        <!-- Format angka views (contoh: 36557 jadi 36.557) -->
+                                        <span><i class="far fa-eye"></i> <%= chapter.views ? chapter.views.toLocaleString('id-ID') : 0 %></span>
+                                    </div>
+                                </a>
+                            <% }); %>
+                        <% } else { %>
+                            <!-- Fallback kalau API chapter kosong -->
+                            <div class="chapter-row" style="justify-content: center; padding: 20px;">
+                                <p style="color: var(--text-muted); font-size: 14px;">Belum ada chapter untuk komik ini.</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Action Cards -->
+                <div class="action-cards" style="margin-top: 30px;">
+                    <div class="action-box">
+                        <div class="action-text">
+                            <h4>Share Ngomikuy</h4>
+                            <p>to your friends</p>
+                        </div>
+                        <button class="btn btn-green"><i class="fas fa-share-alt"></i> Share now</button>
+                    </div>
+                    <div class="action-box">
+                        <div class="action-text">
+                            <h4>Discord</h4>
+                            <p>Join Discord</p>
+                        </div>
+                        <button class="btn btn-purple"><i class="fab fa-discord"></i><a href="https://discord.gg/A37jctvqqZ"> Discord</a></button>
+                    </div>
+                    <div class="action-box">
+                        <div class="action-text">
+                            <h4>KASIH KOPI DISINI</h4>
+                            <p>Kopinya Gaes~</p>
+                        </div>
+                        <button class="btn btn-green"><i class="fas fa-envelope"></i><a href="https://discord.gg/A37jctvqqZ">Donasi</a></button>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-logo">
+            <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+        </div>
+        <p class="footer-tagline">Read Comics, manga, manhua, manhwa, translated swiftly: Ngomikuy, your ultimate library.</p>
+        <div class="footer-bottom">
+            <p><i class="fas fa-heart" style="color: var(--accent-green);"></i> Made by Ngomikuy</p>
+            <p>&copy; 2026 All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <!-- Script Interaktif Tabs -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.detail-tabs .tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-target');
+                    if(target) {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        contents.forEach(c => c.classList.remove('active'));
+                        tab.classList.add('active');
+                        document.getElementById(target).classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const bookmarkBtn = document.getElementById('bookmarkBtn');
+        const bookmarkIcon = document.getElementById('bookmarkIcon');
+        const bookmarkText = document.getElementById('bookmarkText');
+
+        // Ambil data unik manga dari halaman saat ini
+        const mangaId = window.location.pathname.split('/').pop(); // Mengambil ID dari URL /manga/:id
+        const mangaTitle = document.querySelector('.detail-right h1')?.innerText || 'Judul Komik';
+        const mangaCover = document.querySelector('.detail-cover')?.src || '';
+        const mangaRating = document.querySelector('.stat-box .stat-num')?.innerText || '-';
+
+        // Cek apakah komik ini sudah di-bookmark sebelumnya
+        let bookmarks = JSON.parse(localStorage.getItem('yuu_bookmarks')) || [];
+        const isBookmarked = bookmarks.some(item => item.id === mangaId);
+
+        // Set kondisi awal tombol
+        if (isBookmarked) {
+            bookmarkIcon.classList.remove('far');
+            bookmarkIcon.classList.add('fas');
+            bookmarkBtn.style.borderColor = 'var(--accent-green)';
+            bookmarkText.innerText = 'Disimpan';
+        }
+
+        // Event klik tombol bookmark
+        bookmarkBtn.addEventListener('click', () => {
+            bookmarks = JSON.parse(localStorage.getItem('yuu_bookmarks')) || [];
+            const index = bookmarks.findIndex(item => item.id === mangaId);
+
+            if (index > -1) {
+                // Jika sudah ada, hapus dari bookmark (Unbookmark)
+                bookmarks.splice(index, 1);
+                bookmarkIcon.classList.remove('fas');
+                bookmarkIcon.classList.add('far');
+                bookmarkBtn.style.borderColor = 'var(--border-color)';
+                bookmarkText.innerText = 'Bookmark';
+            } else {
+                // Jika belum ada, tambahkan ke bookmark
+                bookmarks.push({
+                    id: mangaId,
+                    title: mangaTitle,
+                    cover: mangaCover,
+                    rating: mangaRating,
+                    url: window.location.pathname
+                });
+                bookmarkIcon.classList.remove('far');
+                bookmarkIcon.classList.add('fas');
+                bookmarkBtn.style.borderColor = 'var(--accent-green)';
+                bookmarkText.innerText = 'Disimpan';
+            }
+
+            // Simpan kembali ke localStorage
+            localStorage.setItem('yuu_bookmarks', JSON.stringify(bookmarks));
+        });
+    });
+</script>
+</body>
+</html>

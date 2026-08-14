@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pustaka - Ngomikuy</title>
+    <link rel="stylesheet" href="/style.css">
+    <!-- FontAwesome buat Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+                <a href="/" class="logo">
+    <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/pustaka" class="active">Pustaka</a></li>
+            <li><a href="/genre">Genre List</a></li>
+            <li><a href="/bookmark">Bookmark</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+            <button class="icon-btn"><i class="far fa-user"></i></button>
+            <button class="icon-btn menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- KONTEN PUSTAKA -->
+    <div class="container pustaka-container">
+        
+        <!-- KOLOM KIRI: FILTER SIDEBAR -->
+        <aside class="pustaka-sidebar">
+            <div class="filter-box">
+                
+                <!-- === 1. FILTER GENRE === -->
+                <div class="filter-group">
+                    <div class="filter-item toggle-btn">
+                        <span>Genre</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="filter-dropdown">
+                        <div class="genre-search-box">
+                            <input type="text" placeholder="Search Genre">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="genre-tags-container">
+                            <% if (genres && genres.length > 0) { %>
+                                <% genres.forEach(function(g) { %>
+                                    <button type="button" class="genre-tag" data-slug="<%= g.slug %>"><%= g.name %></button>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                        <div class="mode-box">
+                            <label>Inclusion mode</label>
+                            <div class="mode-select-wrap">
+                                <select id="genreModeSelect">
+                                    <option value="or" <%= currentQuery.genre_include_mode === 'or' ? 'selected' : '' %>>OR</option>
+                                    <option value="and" <%= currentQuery.genre_include_mode === 'and' ? 'selected' : '' %>>AND</option>
+                                </select>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === 2. FILTER TYPE === -->
+                <div class="filter-group">
+                    <div class="filter-item toggle-btn">
+                        <span>Type</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="filter-dropdown">
+                        <div class="genre-tags-container">
+                            <% if (types && types.length > 0) { %>
+                                <% types.forEach(function(t) { %>
+                                    <button type="button" class="filter-tag-single" data-type="type" data-slug="<%= t.slug %>" style="background:var(--bg-main); border:1px solid <%= currentQuery.type === t.slug ? 'var(--accent-green)' : 'var(--border-color)' %>; color:<%= currentQuery.type === t.slug ? 'var(--accent-green)' : 'var(--text-muted)' %>; padding:5px 10px; border-radius:4px; font-size:12px; cursor:pointer; margin-bottom:5px;"><%= t.name %></button>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === 3. FILTER FORMAT === -->
+                <div class="filter-group">
+                    <div class="filter-item toggle-btn">
+                        <span>Format</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="filter-dropdown">
+                        <div class="genre-tags-container">
+                            <% if (formats && formats.length > 0) { %>
+                                <% formats.forEach(function(f) { %>
+                                    <button type="button" class="filter-tag-single" data-type="format" data-slug="<%= f.slug %>" style="background:var(--bg-main); border:1px solid <%= currentQuery.format === f.slug ? 'var(--accent-green)' : 'var(--border-color)' %>; color:<%= currentQuery.format === f.slug ? 'var(--accent-green)' : 'var(--text-muted)' %>; padding:5px 10px; border-radius:4px; font-size:12px; cursor:pointer; margin-bottom:5px;"><%= f.name %></button>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === 4. FILTER AUTHOR === -->
+                <div class="filter-group">
+                    <div class="filter-item toggle-btn">
+                        <span>Author</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="filter-dropdown">
+                        <div class="genre-search-box">
+                            <input type="text" placeholder="Search Author">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="genre-tags-container" style="max-height: 150px; overflow-y: auto;">
+                            <% if (authors && authors.length > 0) { %>
+                                <% authors.forEach(function(a) { %>
+                                    <button type="button" class="filter-tag-single" data-type="author" data-slug="<%= a.slug %>" style="background:var(--bg-main); border:1px solid <%= currentQuery.author === a.slug ? 'var(--accent-green)' : 'var(--border-color)' %>; color:<%= currentQuery.author === a.slug ? 'var(--accent-green)' : 'var(--text-muted)' %>; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin:2px;"><%= a.name %></button>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === 5. FILTER ARTIST === -->
+                <div class="filter-group">
+                    <div class="filter-item toggle-btn">
+                        <span>Artist</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="filter-dropdown">
+                        <div class="genre-search-box">
+                            <input type="text" placeholder="Search Artist">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="genre-tags-container" style="max-height: 150px; overflow-y: auto;">
+                            <% if (artists && artists.length > 0) { %>
+                                <% artists.forEach(function(ar) { %>
+                                    <button type="button" class="filter-tag-single" data-type="artist" data-slug="<%= ar.slug %>" style="background:var(--bg-main); border:1px solid <%= currentQuery.artist === ar.slug ? 'var(--accent-green)' : 'var(--border-color)' %>; color:<%= currentQuery.artist === ar.slug ? 'var(--accent-green)' : 'var(--text-muted)' %>; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin:2px;"><%= ar.name %></button>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="filter-divider">
+
+                <label class="custom-checkbox">
+                    <input type="checkbox">
+                    <span class="checkmark"><i class="fas fa-check"></i></span>
+                    Project Only
+                </label>
+            </div>
+        </aside>
+
+        <!-- KOLOM KANAN: DAFTAR KOMIK & TOOLBAR -->
+        <main class="pustaka-content">
+            
+            <!-- Toolbar Atas (Search & Sort) -->
+            <div class="pustaka-toolbar">
+                <form action="/pustaka" method="GET" class="search-wrap" style="flex: 1; display: flex; align-items: center; background: #1a1a24; padding: 0 15px; border-radius: 6px;">
+                    <i class="fas fa-search" style="color: var(--text-muted); margin-right: 10px;"></i>
+                    <input type="text" name="q" placeholder="Cari Judul Komik..." value="<%= currentQuery.q || '' %>" style="background: transparent; border: none; color: white; width: 100%; outline: none; padding: 12px 0;">
+                    <button type="submit" style="display: none;"></button>
+                </form>
+                
+                <div class="toolbar-right">
+                    <div class="view-toggles">
+                        <button type="button" class="view-btn"><i class="fas fa-th-large"></i></button>
+                        <button type="button" class="view-btn active"><i class="fas fa-list-ul"></i></button>
+                    </div>
+
+                    <div class="sort-wrap">
+                        <select class="sort-select">
+                            <option value="popular" <%= currentQuery.sort === 'popular' ? 'selected' : '' %>>Popular</option>
+                            <option value="latest" <%= currentQuery.sort === 'latest' ? 'selected' : '' %>>Latest Update</option>
+                            <option value="newest" <%= currentQuery.sort === 'newest' ? 'selected' : '' %>>Newest</option>
+                        </select>
+                        <i class="fas fa-chevron-down sort-arrow"></i>
+                    </div>
+                    <button type="button" class="sort-dir-btn"><i class="fas fa-arrow-up"></i></button>
+                </div>
+            </div>
+
+            <!-- List Komik -->
+            <div class="pustaka-list">
+                <% if (komik && komik.length > 0) { %>
+                    <% komik.forEach(function(item) { %>
+                        <% if (item.manga_id) { %>
+                            <div class="p-card-list">
+                                <a href="/manga/<%= item.manga_id %>" style="flex-shrink: 0;">
+                                    <img src="<%= item.cover_portrait || item.cover %>" alt="<%= item.title %>" class="p-card-thumb">
+                                </a>
+                                <div class="p-card-info">
+                                    <a href="/manga/<%= item.manga_id %>" style="text-decoration: none; color: inherit;">
+                                        <h3><%= item.title %></h3>
+                                    </a>
+                                    <div class="p-card-meta">
+                                        <span class="chapter-text">Chapter <%= item.latest_chapter || '?' %></span>
+                                        <span class="status-badge <%= item.status ? item.status.toLowerCase() : 'ongoing' %>">
+                                            <%= item.status || 'Ongoing' %>
+                                        </span>
+                                    </div>
+                                    <div class="p-card-stats">
+                                        <span><i class="fas fa-star" style="color: #f1c40f;"></i> <%= item.rating || '-' %></span>
+                                        <span><i class="far fa-eye" style="color: #a19fb5;"></i> <%= item.views ? (item.views / 1000000).toFixed(1) + 'M' : '0' %></span>
+                                        <span><i class="fas fa-bookmark" style="color: #3b82f6;"></i> <%= item.bookmarks ? (item.bookmarks / 1000).toFixed(1) + 'K' : '0' %></span>
+                                    </div>
+                                    <p class="p-card-desc">
+                                        <%= item.description ? item.description.substring(0, 150) + '...' : 'Sinopsis tidak tersedia.' %>
+                                    </p>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <div style="padding: 40px; text-align: center; color: var(--text-muted); width: 100%;">
+                        <i class="fas fa-search" style="font-size: 40px; margin-bottom: 15px;"></i>
+                        <p>Komik tidak ditemukan.</p>
+                    </div>
+                <% } %>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer" style="margin-top: 60px;">
+       <div class="footer-logo">
+            <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+        </div>
+        <p class="footer-tagline">Read Comics, manga, manhua, manhwa, translated swiftly: Ngomikuy, your ultimate library.</p>
+        <hr class="footer-divider">
+        <div class="footer-bottom">
+            <p><i class="fas fa-heart" style="color: var(--accent-green);"></i> Made by Ngomikuy</p>
+            <p>&copy; 2026 All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <!-- Script Interaktif Filter & Search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Accordion Toggle Sidebar
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btn.parentElement.classList.toggle('active');
+                });
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // 2. Genre Multi-select
+            let activeGenres = urlParams.get('genre_include') ? urlParams.get('genre_include').split(',') : [];
+            document.querySelectorAll('.genre-tag').forEach(tag => {
+                const slug = tag.getAttribute('data-slug');
+                if (activeGenres.includes(slug)) {
+                    tag.style.borderColor = 'var(--accent-green)';
+                    tag.style.color = 'var(--accent-green)';
+                }
+
+                tag.addEventListener('click', () => {
+                    if (activeGenres.includes(slug)) {
+                        activeGenres = activeGenres.filter(g => g !== slug);
+                    } else {
+                        activeGenres.push(slug);
+                    }
+
+                    if (activeGenres.length > 0) {
+                        urlParams.set('genre_include', activeGenres.join(','));
+                    } else {
+                        urlParams.delete('genre_include');
+                    }
+                    window.location.search = urlParams.toString();
+                });
+            });
+
+            // 3. Single Filter (Type, Format, Author, Artist)
+            document.querySelectorAll('.filter-tag-single').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const type = btn.getAttribute('data-type');
+                    const slug = btn.getAttribute('data-slug');
+
+                    if (urlParams.get(type) === slug) {
+                        urlParams.delete(type);
+                    } else {
+                        urlParams.set(type, slug);
+                    }
+                    window.location.search = urlParams.toString();
+                });
+            });
+
+            // 4. Mode Select (OR / AND)
+            const modeSelect = document.getElementById('genreModeSelect');
+            if (modeSelect) {
+                modeSelect.addEventListener('change', (e) => {
+                    urlParams.set('genre_include_mode', e.target.value);
+                    window.location.search = urlParams.toString();
+                });
+            }
+
+            // 5. Sort Select Dropdown Change
+            const sortSelect = document.querySelector('.sort-select');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', (e) => {
+                    urlParams.set('sort', e.target.value);
+                    window.location.search = urlParams.toString();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
