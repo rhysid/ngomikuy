@@ -242,14 +242,47 @@
     </div>
 
                 <!-- Pagination (Statis sementara) -->
-                <div class="pagination">
-                    <button class="active">1</button>
-                    <button>2</button>
-                    <button>3</button>
-                    <button>4</button>
-                    <button>5</button>
-                    <button><i class="fas fa-chevron-right"></i></button>
-                </div>
+              <div class="pagination-container" style="display: flex; justify-content: center; gap: 8px; margin-top: 30px;">
+    <% if (pagination && pagination.total_pages > 1) { %>
+        
+        <!-- Tombol Previous -->
+        <% if (pagination.current_page > 1) { %>
+            <a href="?page=<%= pagination.current_page - 1 %>" class="page-btn prev" style="padding: 8px 14px; background: #232232; color: #fff; text-decoration: none; border-radius: 4px;">
+                <i class="fas fa-chevron-left"></i> Prev
+            </a>
+        <% } %>
+
+        <!-- Logika Sliding Window (Biar tombol gak kepanjangan sampai 50 kotak) -->
+        <% 
+            let startPage = Math.max(1, pagination.current_page - 2);
+            let endPage = Math.min(pagination.total_pages, pagination.current_page + 2);
+            
+            // Penyesuaian agar selalu tampil 5 kotak jika halamannya mencukupi
+            if (pagination.current_page <= 2 && pagination.total_pages >= 5) {
+                endPage = 5;
+            }
+            if (pagination.current_page >= pagination.total_pages - 1 && pagination.total_pages >= 5) {
+                startPage = pagination.total_pages - 4;
+            }
+        %>
+
+        <!-- Looping Angka Halaman -->
+        <% for(let i = startPage; i <= endPage; i++) { %>
+            <a href="?page=<%= i %>" class="page-btn <%= pagination.current_page == i ? 'active' : '' %>" 
+               style="padding: 8px 14px; background: <%= pagination.current_page == i ? 'var(--accent-green, #00d26a)' : '#232232' %>; color: #fff; text-decoration: none; border-radius: 4px;">
+                <%= i %>
+            </a>
+        <% } %>
+
+        <!-- Tombol Next -->
+        <% if (pagination.current_page < pagination.total_pages) { %>
+            <a href="?page=<%= pagination.current_page + 1 %>" class="page-btn next" style="padding: 8px 14px; background: #232232; color: #fff; text-decoration: none; border-radius: 4px;">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        <% } %>
+        
+    <% } %>
+</div>
             </main>
 
             <!-- KANAN: SIDEBAR -->
