@@ -47,12 +47,24 @@
                 <img src="<%= manga.cover %>" alt="Cover" class="detail-cover">
                 
                 <!-- Tombol Action Utama -->
-                <div class="detail-primary-btns">
-                    <button class="btn btn-green btn-full">Chapter 1</button>
-                   <button type="button" id="bookmarkBtn" class="btn btn-dark btn-full">
-    <i class="far fa-bookmark" id="bookmarkIcon"></i> <span id="bookmarkText">Bookmark</span>
-</button>
-                </div>
+              <div class="detail-primary-btns">
+    <% if (firstChapterId) { %>
+        <!-- Kalau ada chapter 1, tombol berupa link aktif ke halaman baca -->
+        <a href="/read/<%= firstChapterId %>" class="btn btn-green btn-full" style="text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 8px;">
+            <i class="fas fa-book-open"></i> Chapter 1
+        </a>
+    <% } else { %>
+        <!-- Kalau komiknya kosong/belum ada chapter sama sekali -->
+        <button class="btn btn-green btn-full" disabled style="opacity: 0.5; cursor: not-allowed;">
+            Belum Ada Chapter
+        </button>
+    <% } %>
+    
+    <!-- Tombol Bookmark Bawaan Lu -->
+    <button type="button" id="bookmarkBtn" class="btn btn-dark btn-full">
+        <i class="far fa-bookmark" id="bookmarkIcon"></i> <span id="bookmarkText">Bookmark</span>
+    </button>
+</div>
 
                 <!-- Stats (Rating & Favorite) -->
                 <div class="detail-stats-boxes">
