@@ -237,35 +237,60 @@ exports.getMangaDetail = async (req, res, next) => {
     try {
         const mangaId = req.params.id;
         
-        // 1. Siapkan URL Local API (sekarang cuma 1 URL)
+        // 1. Fetch data dari Local API (Halaman 1)
         const apiUrl = `http://217.216.111.75:50033/comic/detail/${mangaId}?apikey=kontol`;
-
-        // 2. Fetch data dari Local API
         const response = await axios.get(apiUrl);
 
-        // Pastikan response sukses
         if (!response.data || !response.data.success) {
             throw new Error('Data API tidak valid atau sukses: false');
         }
 
-        // 3. Ekstrak data dari response JSON (berdasarkan struktur JSON baru)
+        // Ekstrak data utama
         const mangaData = response.data.data.manga;
         const chaptersData = response.data.data.chapters || [];
         const paginationData = response.data.data.pagination || {};
 
-        // Jika data komik tidak ditemukan
         if (!mangaData) {
-            return res.status(404).render('404', { 
-                url: req.originalUrl,
-                message: 'Data komik tidak ditemukan di server.' 
-            });
+            return res.status(404).render('404', { url: req.originalUrl, message: 'Data komik tidak ditemukan.' });
         }
 
-        // 4. Passing data komik, chapter, dan pagination ke view
+        // ==========================================
+        // LOGIKA MENCARI ID CHAPTER 1
+        // ==========================================
+        let firstChapterId = null;
+
+        if (chaptersData.length > 0) {
+            const totalPages = paginationData.total_pages || 1;
+
+            if (totalPages > 1) {
+                // Jika halaman lebih dari 1, Chapter 1 ada di halaman terakhir
+                // Kita tambahkan parameter &page=X sesuai total_pages
+                const lastPageUrl = `http://217.216.111.75:50033/comic/detail/${mangaId}?apikey=kontol&page=${totalPages}`;
+                
+                try {
+                    const lastPageRes = await axios.get(lastPageUrl);
+                    if (lastPageRes.data && lastPageRes.data.success) {
+                        const lastPageChapters = lastPageRes.data.data.chapters;
+                        if (lastPageChapters && lastPageChapters.length > 0) {
+                            // Ambil chapter yang posisinya paling bawah (terakhir di array)
+                            firstChapterId = lastPageChapters[lastPageChapters.length - 1].chapter_id;
+                        }
+                    }
+                } catch (err) {
+                    console.error("Gagal fetch halaman terakhir untuk chapter 1", err.message);
+                }
+            } else {
+                // Jika total_pages cuma 1, Chapter 1 langsung ada di array paling bawah
+                firstChapterId = chaptersData[chaptersData.length - 1].chapter_id;
+            }
+        }
+
+        // 2. Lempar data komik, chapter, pagination, DAN ID Chapter 1 ke View
         res.render('detail', { 
             manga: mangaData,
             chapters: chaptersData,
-            pagination: paginationData
+            pagination: paginationData,
+            firstChapterId: firstChapterId // <- Variabel baru untuk tombol Chapter 1
         });
 
     } catch (error) {
@@ -418,10 +443,15 @@ exports.getLatest = async (req, res, next) => {
 };
 exports.getHomePage = async (req, res, next) => {
     try {
+        // PERBAIKAN DI SINI COY 👇 Ganti req.params jadi req.query
+        const pages = parseInt(req.query.page) || 1; 
+        
+        console.log("Mencoba Fetch Page: " + pages);
+        
         // URL API Lokal lu yang baru
-        const apiUrl = 'http://217.216.111.75:50033/comic/homepage?apikey=kontol';
+        const apiUrl = `http://217.216.111.75:50033/comic/homepage?apikey=kontol&page=${pages}&page_size=30`;
 
-        // Tembak API-nya (sekarang cuma 1 request, jadi jauh lebih cepat)
+        // Tembak API-nya
         const response = await axios.get(apiUrl);
         
         // Cek apakah response sukses dan datanya ada
@@ -433,6 +463,7 @@ exports.getHomePage = async (req, res, next) => {
                 heroBanners: komikData.heroBanners || [],
                 popularToday: komikData.popularToday || [],
                 latestUpdates: komikData.latestUpdates || [],
+                pagination: komikData.pagination || {},
                 topSeries: komikData.topSeries || []
             });
         } else {
