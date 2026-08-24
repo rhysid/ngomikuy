@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.innerHTML = `
             <div class="mobile-menu-content">
                 <div class="mobile-menu-header">
-                   <img src="/yuukomik.png" alt="Yuukomik" class="logo-img">
+                   <img src="/ngomikuy.png" alt="Ngomikuy" class="logo-img">
                     <button class="close-mobile-menu">&times;</button>
                 </div>
                 <ul>
