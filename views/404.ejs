@@ -7,17 +7,59 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="manifest" href="/site.webmanifest">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Halaman Tidak Ditemukan</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding-top: 100px; }
-        h1 { font-size: 50px; color: #333; }
-        a { text-decoration: none; color: blue; }
-    </style>
+    <title>Bookmark - Ngomikuy</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>404</h1>
-    <h2>Oops! <%= message %></h2>
-    <p>URL <strong><%= url %></strong> yang Anda tuju tidak ada dalam sistem kami.</p>
-    <a href="/">Kembali ke Halaman Utama</a>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+                   <a href="/" class="logo">
+    <img src="/ngomikuy.png" alt="Ngomikuy" class="logo-img">
+</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/pustaka">Pustaka</a></li>
+            <li><a href="/genre">Genre</a></li>
+            <li><a href="/bookmark">Bookmark</a></li>
+            <li><a href="/support">Support</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+            <a href="/member/dashboard" class="icon-btn"><i class="far fa-user"></i></a>
+            <button class="icon-btn menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+       <!-- KONTEN BOOKMARK -->
+    <div class="container" style="margin-top: 40px;">
+        <div class="section-header-flex" style="margin-bottom: 30px;">
+          
+            <h3>404 - Oops! <%= message %></h3>
+            
+        </div>
+          <center>
+    <p>URL <strong><%= url %></strong> yang Anda tuju tidak ada dalam sistem kami.</p><br />
+    <a style="background: #ffb7c5; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;" href="/">Kembali ke Halaman Utama</a>
+            </center>
+</div>
+    <footer class="site-footer">
+            <div class="footer-logo">
+            <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+        </div>
+            <p class="footer-tagline">Read Comics, manga, manhua, manhwa, translated swiftly: Ngomikuy, your ultimate library.</p>
+            <a href="/contact" class="footer-contact">Contact us</a>
+            
+            <hr class="footer-divider">
+            
+            <div class="footer-bottom">
+                <p><i class="fas fa-heart"></i> Made by Ngomikuy</p>
+                <p>&copy; 2026 All Rights Reserved</p>
+            </div>
+        </footer>
+      <script src="/script.js"></script>
 </body>
 </html>
