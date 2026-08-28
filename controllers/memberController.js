@@ -9,3 +9,10 @@ exports.getDashboard = async (req, res, next) => {
         });
     }
 };
+exports.postLogin = (req, res) => {
+    // Di masa depan lu bisa tambahin logika verifikasi database di sini
+    // const { username, password } = req.body;
+    
+    // Karena sekarang cuma tampilan, langsung arahkan ke Dashboard
+    res.redirect('/member/dashboard');
+};
