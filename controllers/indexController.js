@@ -412,6 +412,17 @@ exports.getHomePageLama = async (req, res, next) => {
             });
     }
 };
+exports.getSupportPage = (req, res, next) => {
+    try {
+        res.render('support'); 
+    } catch (error) {
+        console.error("Gagal memuat halaman Support:", error.message);
+        res.status(500).render('404', { 
+            url: req.originalUrl,
+            message: 'Gagal memuat halaman Support.' 
+        });
+    }
+};
 exports.getLatest = async (req, res, next) => {
     try {
         // URL API Lokal lu yang baru
@@ -439,6 +450,31 @@ exports.getLatest = async (req, res, next) => {
             url: req.originalUrl,
             message: 'Gagal memuat halaman utama.' 
         });
+    }
+};
+exports.getContact = async (req,res)=> {
+    res.send("Gaada kontak donate aja : ")
+}
+// Tambahkan di controllers/indexController.js
+exports.liveSearchProxy = async (req, res) => {
+    try {
+        const query = req.query.q;
+        
+        // Kalau input kosong, kembalikan JSON kosong
+        if (!query) {
+            return res.json({ success: true, data: { komik: [] } });
+        }
+
+        // URL API ASLI DAN API KEY AMAN DI DALAM SERVER NODE.JS LU
+        const apiUrl = `http://217.216.111.75:50033/comic/pustaka?apikey=kontol&q=${encodeURIComponent(query)}`;
+        const response = await axios.get(apiUrl);
+
+        // Oper balik JSON murni ke frontend browser
+        res.json(response.data);
+
+    } catch (error) {
+        console.error("Live Search Error:", error.message);
+        res.status(500).json({ success: false, message: "Gagal mengambil data pencarian" });
     }
 };
 exports.getHomePage = async (req, res, next) => {
