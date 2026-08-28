@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - Ngomikuy</title>
+    <!-- Pastikan file style.css ada di dalam folder /public -->
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* CSS SUPPORT PAGE */
+.support-container { max-width: 1000px; margin: 60px auto; padding: 20px; color: #fff; text-align: center; }
+.support-header { margin-bottom: 50px; }
+.support-badge { display: inline-block; background: rgba(255, 59, 92, 0.1); color: #ff3b5c; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-bottom: 20px; }
+.support-header h1 { font-size: 36px; font-weight: 800; margin-bottom: 16px; }
+.support-header p { color: #a19fb5; font-size: 15px; max-width: 700px; margin: 0 auto; line-height: 1.6; }
+.support-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.support-card { background-color: #1a1a24; border-radius: 12px; padding: 30px 25px; text-align: left; display: flex; flex-direction: column; border: 1px solid #2a2938; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.support-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+.icon-wrapper { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px; }
+.saweria-icon { background: rgba(251, 188, 5, 0.1); color: #fbbc05; border: 1px solid rgba(251, 188, 5, 0.2); }
+.saweria-btn { background: #fbbc05; color: #111; }
+.saweria-btn:hover { background: #e0a800; }
+.trakteer-icon { background: rgba(233, 67, 57, 0.1); color: #e94339; border: 1px solid rgba(233, 67, 57, 0.2); }
+.trakteer-btn { background: #e94339; color: #fff; }
+.trakteer-btn:hover { background: #c9302c; }
+.discord-icon { background: rgba(88, 101, 242, 0.1); color: #5865f2; border: 1px solid rgba(88, 101, 242, 0.2); }
+.discord-btn { background: #5865f2; color: #fff; }
+.discord-btn:hover { background: #4752c4; }
+.support-card h3 { font-size: 20px; margin-bottom: 12px; color: #fff; font-weight: 700; }
+.support-card p { color: #a19fb5; font-size: 14px; line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
+.support-btn { display: block; width: 100%; padding: 12px; text-align: center; border-radius: 6px; font-weight: 700; text-decoration: none; transition: background 0.2s ease; font-size: 14px; }
+.support-btn i { margin-right: 6px; }
+    </style>
+    <!-- FontAwesome buat Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/" class="logo">
+                <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+            </a>
+        </div>
+        
+        <!-- Menu Navigasi di Tengah -->
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/pustaka">Pustaka</a></li>
+            <li><a href="/genre">Genre List</a></li>
+            <li><a href="/bookmark">Bookmark</a></li>
+            <li><a href="/support" class="active">Support</a></li>
+        </ul>
+        
+        <!-- Icon Kanan -->
+        <div class="nav-right">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+            <a href="/member/dashboard" class="icon-btn"><i class="far fa-user"></i></a>
+            <!-- Tombol Hamburger baru buat mobile -->
+            <button class="icon-btn menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- ==========================================
+             SUPPORT / DONATION SECTION
+             ========================================== -->
+        <main class="support-container">
+            <!-- BAGIAN JUDUL & SUBJUDUL -->
+            <div class="support-header">
+                <span class="support-badge"><i class="fas fa-heart"></i> Support Ngomikuy Infrastructure</span>
+                <h1>Dukung Server Kami</h1>
+                <p>Ngomikuy berkomitmen menyajikan pengalaman baca komik tanpa popup iklan mengganggu. Dukunganmu sangat berarti untuk membantu biaya server, CDN, dan storage.</p>
+            </div>
+
+            <!-- BAGIAN KARTU DONASI (GRID) -->
+            <div class="support-cards">
+                
+                <!-- CARD 1: SAWERIA -->
+                <div class="support-card saweria-card">
+                    <div class="icon-wrapper saweria-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h3>Saweria</h3>
+                    <p>Dukung via QRIS, GoPay, OVO, DANA, LinkAja, atau ShopeePay mulai dari Rp 5.000.</p>
+                    <a href="https://saweria.co/Ngomikuy" target="_blank" class="support-btn saweria-btn">
+                        <i class="fas fa-coffee"></i> Traktir via Saweria
+                    </a>
+                </div>
+
+                <!-- CARD 2: TRAKTEER -->
+                <div class="support-card trakteer-card">
+                    <div class="icon-wrapper trakteer-icon">
+                        <i class="fas fa-bowl-rice"></i>
+                    </div>
+                    <h3>Trakteer</h3>
+                    <p>Dukung kreator & server Ngomikuy lewat trakteer es krim atau mie instan.</p>
+                    <a href="#" target="_blank" class="support-btn trakteer-btn">
+                        <i class="fas fa-heart"></i> Traktir via Trakteer
+                    </a>
+                </div>
+
+                <!-- CARD 3: DISCORD -->
+                <div class="support-card discord-card">
+                    <div class="icon-wrapper discord-icon">
+                        <i class="fab fa-discord"></i>
+                    </div>
+                    <h3>Discord Community</h3>
+                    <p>Gabung dengan ribuan pembaca lain, dapatkan role Supporter, notifikasi chapter kilat, dan rekomendasi komik.</p>
+                    <a href="https://discord.gg/A37jctvqqZ" target="_blank" class="support-btn discord-btn">
+                        <i class="fab fa-discord"></i> Join Discord Server
+                    </a>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- ==========================================
+             FOOTER SECTION
+             ========================================== -->
+        <footer class="site-footer" style="margin-top: 60px;">
+            <div class="footer-logo">
+                <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
+            </div>
+            <p class="footer-tagline">Read Comics, manga, manhua, manhwa, translated swiftly: Ngomikuy, your ultimate library.</p>
+            <a href="/contact" class="footer-contact">Contact us</a>
+            
+            <hr class="footer-divider">
+            
+            <div class="footer-bottom">
+                <p><i class="fas fa-heart"></i> Made by Ngomikuy</p>
+                <p>&copy; 2026 All Rights Reserved</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Pastikan file script.js ada di dalam folder /public -->
+    <script src="/script.js"></script>
+</body>
+</html>
