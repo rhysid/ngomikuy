@@ -11,6 +11,10 @@ router.get('/manga/:id', indexController.getMangaDetail);
 router.get('/genre', indexController.getGenrePage);
 router.get('/bookmark', indexController.getBookmarkPage);
 router.get('/latest-update', indexController.getLatest)
+router.get('/api/search', indexController.liveSearchProxy);
+router.get('/support', indexController.getSupportPage);
 
+//Member Router/Endpoint
+router.post('/member/login', memberController.postLogin);
 router.get('/member/dashboard', memberController.getDashboard);
 module.exports = router;
