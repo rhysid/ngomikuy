@@ -1,343 +1,233 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= manga.title || 'Detail Komik' %> - Ngomikuy</title>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-</head>
-<body>
+const axios = require('axios');
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="nav-left">
-           <a href="/" class="logo">
-    <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
-</a>
-        </div>
-        <ul class="nav-links">
-            <li><a href="/">Home</a></li>
-            <li><a href="/pustaka">Pustaka</a></li>
-            <li><a href="/genre">Genre List</a></li>
-            <li><a href="/bookmark">Bookmark</a></li>
-            <li><a href="/support">Support</a></li>
-        </ul>
-        <div class="nav-right">
-            <button class="icon-btn"><i class="fas fa-search"></i></button>
-            <a href="/member/dashboard" class="icon-btn"><i class="far fa-user"></i></a>
-            <button class="icon-btn menu-btn"><i class="fas fa-bars"></i></button>
-        </div>
-    </nav>
+// Fungsi buat ngambil list semua genre
+exports.fetchGenresData = async () => {
+    try {
+        const genresUrl = 'https://www.sankavollerei.web.id/comic/shinigami/genres';
+        const response = await axios.get(genresUrl);
+        const genresData = response.data?.data || [];
 
-    <!-- DETAIL CONTAINER -->
-    <div class="detail-container">
-        
-        <!-- Background Blur Image -->
-        <div class="detail-bg-blur" style="background-image: url('<%= manga.cover_portrait || manga.cover %>');"></div>
+        // Return JSON dengan key 'genres' biar klop sama EJS lu
+        return {
+            status: 'success',
+            data: {
+                genres: genresData // Dipakai di <% genres.forEach(function(g) { %>
+            }
+        };
+    } catch (error) {
+        console.error("Error saat fetch Genre:", error.message);
+        return { status: 'error', message: error.message };
+    }
+};
+// Fungsi buat ngambil data pencarian (Pustaka) beserta semua data filter-nya
+exports.fetchPustakaData = async (queryParams) => {
+    try {
+        // Ambil nilai dari query URL atau set default-nya
+        const page = queryParams.page || 1;
+        const pageSize = 24;
+        const query = queryParams.q || '';
+        const genreInclude = queryParams.genre_include || '';
+        const genreIncludeMode = queryParams.genre_include_mode || 'or';
+        const sort = queryParams.sort || 'popular';
+        const type = queryParams.type || '';
+        const format = queryParams.format || '';
+        const author = queryParams.author || '';
+        const artist = queryParams.artist || '';
 
-        <div class="container detail-content">
-            
-            <!-- KOLOM KIRI (Cover & Info) -->
-            <aside class="detail-left">
-                <img src="<%= manga.cover %>" alt="Cover" class="detail-cover">
-                
-                <!-- Tombol Action Utama -->
-              <div class="detail-primary-btns">
-    <% if (firstChapterId) { %>
-        <!-- Kalau ada chapter 1, tombol berupa link aktif ke halaman baca -->
-        <a href="/read/<%= firstChapterId %>" class="btn btn-green btn-full" style="text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 8px;">
-            <i class="fas fa-book-open"></i> Chapter 1
-        </a>
-    <% } else { %>
-        <!-- Kalau komiknya kosong/belum ada chapter sama sekali -->
-        <button class="btn btn-green btn-full" disabled style="opacity: 0.5; cursor: not-allowed;">
-            Belum Ada Chapter
-        </button>
-    <% } %>
-    
-    <!-- Tombol Bookmark Bawaan Lu -->
-    <button type="button" id="bookmarkBtn" class="btn btn-dark btn-full">
-        <i class="far fa-bookmark" id="bookmarkIcon"></i> <span id="bookmarkText">Bookmark</span>
-    </button>
-</div>
+        // 1. Susun URL Advanced Search utama
+        let searchApiUrl = `https://www.sankavollerei.web.id/comic/shinigami/advanced-search?page=${page}&page_size=${pageSize}&sort=${sort}`;
 
-                <!-- Stats (Rating & Favorite) -->
-                <div class="detail-stats-boxes">
-                    <div class="stat-box">
-                        <i class="fas fa-star" style="color: #f1c40f;"></i>
-                        <div class="stat-text">
-                            <span class="stat-num"><%= manga.rating || 'N/A' %></span>
-                            <span class="stat-label">Ratings</span>
-                        </div>
-                    </div>
-                    <div class="stat-box">
-                        <i class="fas fa-bookmark" style="color: #3498db;"></i>
-                        <div class="stat-text">
-                            <% const bookmarksCount = manga.bookmarks ? manga.bookmarks.toLocaleString('id-ID') : '0'; %>
-                            <span class="stat-num"><%= bookmarksCount %></span>
-                            <span class="stat-label">Favorites</span>
-                        </div>
-                    </div>
-                </div>
+        if (query) searchApiUrl += `&q=${encodeURIComponent(query)}`;
+        if (genreInclude) searchApiUrl += `&genre_include=${encodeURIComponent(genreInclude)}&genre_include_mode=${genreIncludeMode}`;
+        if (type) searchApiUrl += `&type=${encodeURIComponent(type)}`;
+        if (format) searchApiUrl += `&format=${encodeURIComponent(format)}`;
+        if (author) searchApiUrl += `&author=${encodeURIComponent(author)}`;
+        if (artist) searchApiUrl += `&artist=${encodeURIComponent(artist)}`;
 
-                <!-- List Informasi -->
-                <ul class="detail-info-list">
-                    <li>
-                        <span><i class="fas fa-cube"></i> Format</span>
-                        <span class="info-val">
-                            <% if (manga.format && manga.format.length > 0) { %>
-                                <%= manga.format[0].name %>
-                            <% } else { %>
-                                -
-                            <% } %>
-                        </span>
-                    </li>
-                    <li>
-                        <span><i class="far fa-calendar-alt"></i> Released</span>
-                        <span class="info-val"><%= manga.release_year || '-' %></span>
-                    </li>
-                    <li>
-                        <span><i class="far fa-eye"></i> Total views</span>
-                        <span class="info-val">
-                            <% const viewsCount = manga.views ? manga.views.toLocaleString('id-ID') : '0'; %>
-                            <%= viewsCount %>
-                        </span>
-                    </li>
-                    <li>
-                        <span><i class="fas fa-flag"></i> Country</span>
-                        <span class="info-val"><%= manga.country || '-' %></span>
-                    </li>
-                    <li>
-                        <span><i class="fas fa-user-edit"></i> Author</span>
-                        <span class="info-val text-right">
-                            <% if (manga.authors && manga.authors.length > 0) { %>
-                                <%= manga.authors.map(function(a) { return a.name; }).join(', ') %>
-                            <% } else { %>
-                                -
-                            <% } %>
-                        </span>
-                    </li>
-                    <li>
-                        <span><i class="fas fa-paint-brush"></i> Artist</span>
-                        <span class="info-val text-right">
-                            <% if (manga.artists && manga.artists.length > 0) { %>
-                                <%= manga.artists.map(function(a) { return a.name; }).join(', ') %>
-                            <% } else { %>
-                                -
-                            <% } %>
-                        </span>
-                    </li>
-                    <li>
-                        <span><i class="fas fa-info-circle"></i> Status</span>
-                        <span class="info-val"><%= manga.status || 'Unknown' %></span>
-                    </li>
-                </ul>
-            </aside>
+        // 2. Siapkan Endpoint untuk dropdown filter
+        const genresUrl = 'https://www.sankavollerei.web.id/comic/shinigami/genres';
+        const typesUrl = 'https://www.sankavollerei.web.id/comic/shinigami/types';
+        const formatsUrl = 'https://www.sankavollerei.web.id/comic/shinigami/formats';
+        const authorsUrl = 'https://www.sankavollerei.web.id/comic/shinigami/authors?q=&page=1';
+        const artistsUrl = 'https://www.sankavollerei.web.id/comic/shinigami/artists?q=&page=1';
 
-            <!-- KOLOM KANAN (Sinopsis & Komentar) -->
-            <main class="detail-right">
-                
-                <!-- Judul -->
-                <h1><%= manga.title %></h1>
-                <p class="alt-title"><%= manga.alternative_title || '-' %></p>
+        // 3. Fetch semuanya secara paralel
+        const [searchRes, genresRes, typesRes, formatsRes, authorsRes, artistsRes] = await Promise.all([
+            axios.get(searchApiUrl),
+            axios.get(genresUrl).catch(() => ({ data: { data: [] } })),
+            axios.get(typesUrl).catch(() => ({ data: { data: [] } })),
+            axios.get(formatsUrl).catch(() => ({ data: { data: [] } })),
+            axios.get(authorsUrl).catch(() => ({ data: { data: [] } })),
+            axios.get(artistsUrl).catch(() => ({ data: { data: [] } }))
+        ]);
 
-                <!-- Tabs -->
-       <!-- Tabs -->
-                <div class="detail-tabs">
-                    <span class="tab active" data-target="tab-synopsis"><i class="fas fa-list-ul"></i> Synopsis</span>
-                    <!-- Mengambil total_record dari API pagination buat nampilin total chapter -->
-                    <span class="tab" data-target="tab-chapters">
-                        <i class="fas fa-book-open"></i> Chapters (<%= pagination.total_record || chapters.length || 0 %>)
-                    </span>
-                </div>
+        // 4. Return JSON dengan struktur KEY yang pas sama EJS lu
+        return {
+            status: 'success',
+            data: {
+                komik: searchRes.data?.data || [],
+                pagination: searchRes.data?.pagination || {},
+                genres: genresRes.data?.data || [],
+                types: typesRes.data?.data || [],
+                formats: formatsRes.data?.data || [],
+                // Filter author & artist yang ada ID-nya aja biar nggak error pas di-loop EJS
+                authors: (authorsRes.data?.data || []).filter(item => item.id),
+                artists: (artistsRes.data?.data || []).filter(item => item.id),
+                // Kirim balik query saat ini biar EJS tau filter apa yang lagi aktif
+                currentQuery: queryParams 
+            }
+        };
 
-                <!-- ================= TAB SINOPSIS ================= -->
-                <div id="tab-synopsis" class="tab-content active">
-                    <div class="summary-box">
-                        <h4>Summary</h4>
-                        <p class="summary-text">
-                            <%= manga.description || 'Sinopsis belum tersedia.' %>
-                        </p>
-                    </div>
+    } catch (error) {
+        console.error("Error saat fetch Pustaka:", error.message);
+        return { status: 'error', message: error.message };
+    }
+};
+// Fungsi buat ngambil data 1 Chapter (beserta gambar, navigasi, dan list chapter lain)
+exports.fetchReadChapter = async (chapterId) => {
+    try {
+        // 1. Fetch data chapter utama (buat dapetin id manga dan list gambar)
+        const readUrl = `https://www.sankavollerei.web.id/comic/shinigami/read/${chapterId}`;
+        const readRes = await axios.get(readUrl);
+        const readData = readRes.data?.data;
 
-                    <div class="detail-tags">
-                        <% if (manga.genres && manga.genres.length > 0) { %>
-                            <% manga.genres.forEach(function(genre) { %>
-                                <span><%= genre.name %></span>
-                            <% }); %>
-                        <% } else { %>
-                            <span>No Genres</span>
-                        <% } %>
-                    </div>
-                </div>
-
-                <!-- ================= TAB CHAPTERS ================= -->
-                <div id="tab-chapters" class="tab-content">
-                    <div class="chapter-search-box">
-                        <input type="text" placeholder="Search chapter">
-                    </div>
-
-                    <div class="chapter-list-container">
-                        <% if (chapters && chapters.length > 0) { %>
-                            <% chapters.forEach(function(chapter) { %>
-                                <!-- Nanti href-nya bisa diarahkan ke halaman /read/:chapter_id -->
-                                <a href="/read/<%= chapter.chapter_id %>" class="chapter-row">
-                                    <div class="chap-left">
-                                        <!-- Jika thumbnail chapter null/kosong, pakai cover komik -->
-                                        <img src="<%= chapter.thumbnail || manga.cover %>" alt="Chapter <%= chapter.chapter_number %>">
-                                        <div class="chap-title">
-                                            <h5>Chapter <%= chapter.chapter_number %></h5>
-                                            
-                                            <!-- Format tanggal (contoh: dari 2026-07-28T03:27:57Z jadi format lokal) -->
-                                            <% 
-                                                const date = new Date(chapter.release_date); 
-                                                const options = { day: 'numeric', month: 'short', year: 'numeric' };
-                                                const formattedDate = date.toLocaleDateString('id-ID', options);
-                                            %>
-                                            <span><%= formattedDate %></span>
-                                        </div>
-                                    </div>
-                                    <div class="chap-right">
-                                        <!-- Format angka views (contoh: 36557 jadi 36.557) -->
-                                        <span><i class="far fa-eye"></i> <%= chapter.views ? chapter.views.toLocaleString('id-ID') : 0 %></span>
-                                    </div>
-                                </a>
-                            <% }); %>
-                        <% } else { %>
-                            <!-- Fallback kalau API chapter kosong -->
-                            <div class="chapter-row" style="justify-content: center; padding: 20px;">
-                                <p style="color: var(--text-muted); font-size: 14px;">Belum ada chapter untuk komik ini.</p>
-                            </div>
-                        <% } %>
-                    </div>
-                </div>
-
-                <!-- Action Cards -->
-                <div class="action-cards" style="margin-top: 30px;">
-                    <div class="action-box">
-                        <div class="action-text">
-                            <h4>Share Ngomikuy</h4>
-                            <p>to your friends</p>
-                        </div>
-                        <button class="btn btn-green"><i class="fas fa-share-alt"></i> Share now</button>
-                    </div>
-                    <div class="action-box">
-                        <div class="action-text">
-                            <h4>Discord</h4>
-                            <p>Join Discord</p>
-                        </div>
-                        <button class="btn btn-purple"><i class="fab fa-discord"></i><a href="https://discord.gg/A37jctvqqZ"> Discord</a></button>
-                    </div>
-                    <div class="action-box">
-                        <div class="action-text">
-                            <h4>KASIH KOPI DISINI</h4>
-                            <p>Kopinya Gaes~</p>
-                        </div>
-                        <button class="btn btn-green"><i class="fas fa-envelope"></i><a href="https://discord.gg/A37jctvqqZ">Donasi</a></button>
-                    </div>
-                </div>
-
-            </main>
-        </div>
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
-            <div class="footer-logo">
-            <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
-        </div>
-            <p class="footer-tagline">Read Comics, manga, manhua, manhwa, translated swiftly: Ngomikuy, your ultimate library.</p>
-            <a href="/contact" class="footer-contact">Contact us</a>
-            
-            <hr class="footer-divider">
-            
-            <div class="footer-bottom">
-                <p><i class="fas fa-heart"></i> Made by Ngomikuy</p>
-                <p>&copy; 2026 All Rights Reserved</p>
-            </div>
-        </footer>
-
-    <!-- Script Interaktif Tabs -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('.detail-tabs .tab');
-            const contents = document.querySelectorAll('.tab-content');
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const target = tab.getAttribute('data-target');
-                    if(target) {
-                        tabs.forEach(t => t.classList.remove('active'));
-                        contents.forEach(c => c.classList.remove('active'));
-                        tab.classList.add('active');
-                        document.getElementById(target).classList.add('active');
-                    }
-                });
-            });
-        });
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const bookmarkBtn = document.getElementById('bookmarkBtn');
-        const bookmarkIcon = document.getElementById('bookmarkIcon');
-        const bookmarkText = document.getElementById('bookmarkText');
-
-        // Ambil data unik manga dari halaman saat ini
-        const mangaId = window.location.pathname.split('/').pop(); // Mengambil ID dari URL /manga/:id
-        const mangaTitle = document.querySelector('.detail-right h1')?.innerText || 'Judul Komik';
-        const mangaCover = document.querySelector('.detail-cover')?.src || '';
-        const mangaRating = document.querySelector('.stat-box .stat-num')?.innerText || '-';
-
-        // Cek apakah komik ini sudah di-bookmark sebelumnya
-        let bookmarks = JSON.parse(localStorage.getItem('yuu_bookmarks')) || [];
-        const isBookmarked = bookmarks.some(item => item.id === mangaId);
-
-        // Set kondisi awal tombol
-        if (isBookmarked) {
-            bookmarkIcon.classList.remove('far');
-            bookmarkIcon.classList.add('fas');
-            bookmarkBtn.style.borderColor = 'var(--accent-green)';
-            bookmarkText.innerText = 'Disimpan';
+        // Kalau chapter nggak ketemu di server sumber
+        if (!readData) {
+            return { status: 'not_found', message: 'Data chapter tidak ditemukan anjir.' };
         }
 
-        // Event klik tombol bookmark
-        bookmarkBtn.addEventListener('click', () => {
-            bookmarks = JSON.parse(localStorage.getItem('yuu_bookmarks')) || [];
-            const index = bookmarks.findIndex(item => item.id === mangaId);
+        const mangaId = readData.manga_id;
 
-            if (index > -1) {
-                // Jika sudah ada, hapus dari bookmark (Unbookmark)
-                bookmarks.splice(index, 1);
-                bookmarkIcon.classList.remove('fas');
-                bookmarkIcon.classList.add('far');
-                bookmarkBtn.style.borderColor = 'var(--border-color)';
-                bookmarkText.innerText = 'Bookmark';
-            } else {
-                // Jika belum ada, tambahkan ke bookmark
-                bookmarks.push({
-                    id: mangaId,
-                    title: mangaTitle,
-                    cover: mangaCover,
-                    rating: mangaRating,
-                    url: window.location.pathname
-                });
-                bookmarkIcon.classList.remove('far');
-                bookmarkIcon.classList.add('fas');
-                bookmarkBtn.style.borderColor = 'var(--accent-green)';
-                bookmarkText.innerText = 'Disimpan';
+        // 2. Fetch Detail Manga (untuk judul) & List Chapter (untuk Dropdown) secara paralel
+        const detailUrl = `https://www.sankavollerei.web.id/comic/shinigami/detail/${mangaId}`;
+        const chaptersUrl = `https://www.sankavollerei.web.id/comic/shinigami/chapters/${mangaId}`;
+
+        const [detailRes, chaptersRes] = await Promise.all([
+            // Pake .catch supaya kalo gagal fetch detail/list, gambar chapter tetep bisa ditampilin
+            axios.get(detailUrl).catch(() => ({ data: { data: {} } })),
+            axios.get(chaptersUrl).catch(() => ({ data: { data: [] } }))
+        ]);
+
+        const mangaDetail = detailRes.data?.data || {};
+        const chaptersList = chaptersRes.data?.data || [];
+
+        // 3. Return JSON dengan key yang langsung klop sama file EJS lu
+        return {
+            status: 'success',
+            data: {
+                read: readData,       // Dipakai buat nampilin <%= read.images %>, <%= read.prev_chapter %>, dll
+                manga: mangaDetail,   // Dipakai buat <%= manga.title %> dan <%= manga.cover %>
+                chapters: chaptersList // Dipakai buat looping dropdown <% chapters.forEach(...) %>
             }
+        };
 
-            // Simpan kembali ke localStorage
-            localStorage.setItem('yuu_bookmarks', JSON.stringify(bookmarks));
+    } catch (error) {
+        console.error(`Error Fetch Read Chapter ID ${chapterId}:`, error.message);
+        return { status: 'error', message: error.message };
+    }
+};
+
+// Tambahin fungsi ini di bagian bawah file
+exports.fetchMangaDetail = async (mangaId) => {
+    try {
+        const detailUrl = `https://www.sankavollerei.web.id/comic/shinigami/detail/${mangaId}`;
+        const chaptersUrl = `https://www.sankavollerei.web.id/comic/shinigami/chapters/${mangaId}`;
+
+        // Fetch kedua API secara bersamaan (paralel)
+        // Pake .catch biar kalo API chapter error, detail tetep jalan
+        const [detailRes, chaptersRes] = await Promise.all([
+            axios.get(detailUrl),
+            axios.get(chaptersUrl).catch(err => ({ data: { data: [], pagination: {} } }))
+        ]);
+
+        // Ekstrak data
+        const mangaData = detailRes.data?.data;
+        const chaptersData = chaptersRes.data?.data || [];
+        const paginationData = chaptersRes.data?.pagination || {};
+
+        // Kalau ID komiknya ngaco atau gak nemu
+        if (!mangaData) {
+            return { status: 'not_found', message: 'Data komik tidak ditemukan di server.' };
+        }
+
+        // Return JSON dengan key yang langsung klop sama EJS lu
+        return {
+            status: 'success',
+            data: {
+                manga: mangaData,       // Dipakai buat <%= manga.title %>, <%= manga.cover %>, dll
+                chapters: chaptersData, // Dipakai buat <% chapters.forEach(...) %>
+                pagination: paginationData // Dipakai buat <%= pagination.total_record %>
+            }
+        };
+
+    } catch (error) {
+        console.error(`Error Fetch Detail Manga ID ${mangaId}:`, error.message);
+        return { status: 'error', message: error.message };
+    }
+};
+exports.fetchHomepageData = async () => {
+    try {
+        // 1. Setup URL (Sesuai request lu, random page sampai 50 untuk Hero)
+        const randomPage = Math.floor(Math.random() * 50) + 1;
+        const baseUrl = 'https://www.sankavollerei.web.id/comic/shinigami';
+        
+        const heroUrl = `${baseUrl}/latest?page=${randomPage}`;
+        const popularUrl = `${baseUrl}/popular?page=1&page_size=16`;
+        const latestUrl = `${baseUrl}/latest?page=1&page_size=24`;
+        const recommendedUrl = `${baseUrl}/recommended?page=1`;
+
+        // 2. Fetch API tahap pertama secara PARALEL
+        const [heroRes, popularRes, latestRes, recommendedRes] = await Promise.all([
+            axios.get(heroUrl),
+            axios.get(popularUrl),
+            axios.get(latestUrl),
+            axios.get(recommendedUrl)
+        ]);
+
+        // Ekstrak data
+        const rawHero = heroRes.data?.data || heroRes.data || [];
+        const popularToday = popularRes.data?.data || popularRes.data || [];
+        const rawLatest = latestRes.data?.data || latestRes.data || [];
+        const topSeries = recommendedRes.data?.data || recommendedRes.data || [];
+
+        // Logic Hero: Ambil hanya 3 item pertama
+        const heroBanners = rawHero.slice(0, 3);
+
+        // 3. Logic Latest Updates & Chapters: Fetch chapter secara paralel
+        const latestUpdatesPromises = rawLatest.map(async (manga) => {
+            try {
+                // Asumsi ID manga tersimpan di field 'id', 'manga_id', atau 'slug'
+                const mangaId = manga.manga_id || manga.id || manga.slug; 
+                
+                // Fetch chapter berdasarkan ID
+                const chapterRes = await axios.get(`${baseUrl}/chapters/${mangaId}`);
+                const chaptersData = chapterRes.data?.data || chapterRes.data || [];
+
+                // Ambil 3 chapter terakhir/teratas lalu gabungkan ke object manga
+                manga.latest_chapters = chaptersData.slice(0, 3);
+            } catch (error) {
+                console.error(`Gagal mengambil chapter untuk ID: ${manga.manga_id || manga.id}`, error.message);
+                manga.latest_chapters = []; // Fallback agar tidak crash jika API 1 manga error
+            }
+            return manga;
         });
-    });
-</script>
-  <script src="/script.js"></script>
-</body>
-</html>
+
+        // Tunggu semua proses fetch chapter selesai
+        const latestUpdates = await Promise.all(latestUpdatesPromises);
+
+        // 4. Return data JSON dengan KEY yang persis sama kayak yang dipanggil di EJS lu
+        return {
+            status: 'success',
+            data: {
+                heroBanners: heroBanners,       // Dipakai di <% heroBanners.forEach... %>
+                popularToday: popularToday,     // Dipakai di <% popularToday.forEach... %>
+                latestUpdates: latestUpdates,   // Dipakai di <% latestUpdates.forEach... %>
+                topSeries: topSeries            // Dipakai di <% topSeries.forEach... %>
+            }
+        };
+
+    } catch (error) {
+        console.error("Error saat fetch data Homepage:", error.message);
+        return { status: 'error', message: error.message };
+    }
+};
