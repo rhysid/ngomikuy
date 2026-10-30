@@ -15,7 +15,7 @@ exports.getGenrePage = async (req, res, next) => {
     try {
         // 1. Siapkan URL Local API lu
         // Catatan: Pastikan port-nya benar (3000 atau 5000 sesuai server API lu)
-        const apiUrl = 'http://217.216.111.75:50033/comic/genre?apikey=kontol';
+        const apiUrl = 'http://72.61.208.49:8024/comic/genre?apikey=kontol';
 
         // 2. Fetch data dari Local API
         const response = await axios.get(apiUrl);
@@ -92,7 +92,7 @@ exports.getPustakaPage = async (req, res, next) => {
 
         // 3. Tembak API Pustaka lokal lu
         // Catatan: Kalau API lu jalan di port 5000 kayak sebelumnya, ganti 3000 jadi 5000 ya!
-        const apiUrl = 'http://217.216.111.75:50033/comic/pustaka';
+        const apiUrl = 'http://72.61.208.49:8024/comic/pustaka';
         
         // Axios bakal otomatis nerjemahin apiParams jadi query string URL (?apikey=...&q=...&sort=...)
         const response = await axios.get(apiUrl, { params: apiParams });
@@ -238,7 +238,7 @@ exports.getMangaDetail = async (req, res, next) => {
         const mangaId = req.params.id;
         
         // 1. Fetch data dari Local API (Halaman 1)
-        const apiUrl = `http://217.216.111.75:50033/comic/detail/${mangaId}?apikey=kontol`;
+        const apiUrl = `http://72.61.208.49:8024/comic/detail/${mangaId}?apikey=kontol`;
         const response = await axios.get(apiUrl);
 
         if (!response.data || !response.data.success) {
@@ -265,7 +265,7 @@ exports.getMangaDetail = async (req, res, next) => {
             if (totalPages > 1) {
                 // Jika halaman lebih dari 1, Chapter 1 ada di halaman terakhir
                 // Kita tambahkan parameter &page=X sesuai total_pages
-                const lastPageUrl = `http://217.216.111.75:50033/comic/detail/${mangaId}?apikey=kontol&page=${totalPages}`;
+                const lastPageUrl = `http://72.61.208.49:8024/comic/detail/${mangaId}?apikey=kontol&page=${totalPages}`;
                 
                 try {
                     const lastPageRes = await axios.get(lastPageUrl);
@@ -426,7 +426,7 @@ exports.getSupportPage = (req, res, next) => {
 exports.getLatest = async (req, res, next) => {
     try {
         // URL API Lokal lu yang baru
-        const apiUrl = 'http://217.216.111.75:50033/comic/homepage?apikey=kontol';
+        const apiUrl = 'http://72.61.208.49:8024/comic/homepage?apikey=kontol';
 
         // Tembak API-nya (sekarang cuma 1 request, jadi jauh lebih cepat)
         const response = await axios.get(apiUrl);
@@ -466,7 +466,7 @@ exports.liveSearchProxy = async (req, res) => {
         }
 
         // URL API ASLI DAN API KEY AMAN DI DALAM SERVER NODE.JS LU
-        const apiUrl = `http://217.216.111.75:50033/comic/pustaka?apikey=kontol&q=${encodeURIComponent(query)}`;
+        const apiUrl = `http://72.61.208.49:8024/comic/pustaka?apikey=kontol&q=${encodeURIComponent(query)}`;
         const response = await axios.get(apiUrl);
 
         // Oper balik JSON murni ke frontend browser
@@ -485,7 +485,7 @@ exports.getHomePage = async (req, res, next) => {
         console.log("Mencoba Fetch Page: " + pages);
         
         // URL API Lokal lu yang baru
-        const apiUrl = `http://217.216.111.75:50033/comic/homepage?apikey=kontol&page=${pages}&page_size=30`;
+        const apiUrl = `http://72.61.208.49:8024/comic/homepage?apikey=kontol&page=${pages}&page_size=30`;
 
         // Tembak API-nya
         const response = await axios.get(apiUrl);
@@ -519,7 +519,7 @@ exports.getReadingPage = async (req, res, next) => {
         const chapterId = req.params.id;
         
         // 1. Fetch SEMUA data (gambar, info manga, dan list chapter) dari 1 endpoint lokal!
-        const apiUrl = `http://217.216.111.75:50033/comic/read/${chapterId}?apikey=kontol`;
+        const apiUrl = `http://72.61.208.49:8024/comic/read/${chapterId}?apikey=kontol`;
         const response = await axios.get(apiUrl);
 
         // Pastikan response sukses dan datanya ada
