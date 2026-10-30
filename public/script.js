@@ -63,14 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.innerHTML = `
             <div class="mobile-menu-content">
                 <div class="mobile-menu-header">
-                   <img src="/ngomikuy.png" alt="Ngomikuy" class="logo-img">
+                   <img src="/Ngomikuy.png" alt="Ngomikuy" class="logo-img">
                     <button class="close-mobile-menu">&times;</button>
                 </div>
                 <ul>
+              
                     <li><a href="/">Home</a></li>
                     <li><a href="/pustaka" class="active">Pustaka</a></li>
                     <li><a href="/genre">Genre List</a></li>
                     <li><a href="/bookmark">Bookmark</a></li>
+                    <li><a href='/support'>Support</a></li>
                 </ul>
             </div>
         `;
